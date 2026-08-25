@@ -9,6 +9,7 @@ services:
       - ./config:/openbao/config:ro
       - openbao_data:/openbao/data
       - openbao_logs:/openbao/logs
+      - openbao_file:/openbao/file
     command: ["server", "-config=/openbao/config/config.hcl"]
     cap_add:
       - IPC_LOCK

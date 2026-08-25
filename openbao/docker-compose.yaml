@@ -26,6 +26,9 @@ volumes:
   openbao_logs:
     external: true
     name: openbao_logs
+  openbao_file:
+    external: true
+    name: openbao_file
 networks:
   openbao:
     external: true

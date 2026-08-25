@@ -14,6 +14,9 @@ on:
 jobs:
   bring-up-openbao:
     runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
 
     steps:
       # Clone only the specific path from that branch (Sparse Checkout)

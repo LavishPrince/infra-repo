@@ -14,7 +14,7 @@ services:
       - IPC_LOCK
     environment:
       BAO_ADDR: "http://0.0.0.0:8200"
-      SKIP_CHOWN: "true"
+      # SKIP_CHOWN: "true"
     networks:
       - openbao
 

@@ -33,10 +33,10 @@ jobs:
         working-directory: .\openbao
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
+          $env:Path += ";C:\Users\Vinay DG\AppData\Local\Programs\DockerDesktop\resources\bin"
           docker compose up -d
       - name: Post-run workspace cleanup
         if: always()
         run: |
           Write-Output "Cleaning up self-hosted workspace..."
-          Remove-Item -Path * -Recurforce -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path * -Recurse -Force -ErrorAction SilentlyContinue

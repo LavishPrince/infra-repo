@@ -19,10 +19,10 @@ services:
       - rustfs_data:/data
       - rustfs_logs:/app/logs
     restart: unless-stopped
-    network:
+    networks:
       - rustfs
 
-network:
+networks:
   rustfs:
     external: true
     name: rustfs

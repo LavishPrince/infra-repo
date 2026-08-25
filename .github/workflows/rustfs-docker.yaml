@@ -1,0 +1,43 @@
+name: Openbao Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'rustfs/docker-compose.yaml'
+      - '.github/workflows/rustfs-docker.yaml'
+  workflow_dispatch:
+
+
+jobs:
+  bring-up-openbao:
+    runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
+
+    steps:
+      # Clone only the specific path from that branch (Sparse Checkout)
+      - name: Checkout specific path
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          sparse-checkout: |
+            rustfs
+          sparse-checkout-cone-mode: true
+
+      # Run your Windows command inside the target folder
+      - name: Run command in path
+        working-directory: .\rustfs
+        env:
+          RUSTFS_SECRET_KEY: ${{ secrets.RUSTFS_SECRET_KEY }}
+          RUSTFS_ACCESS_KEY: ${{ secrets.RUSTFS_ACCESS_KEY }}
+        run: |
+          Write-Output "Currently running in: $(Get-Location)"
+          docker compose up -d
+      - name: Post-run workspace cleanup
+        if: always()
+        run: |
+          Write-Output "Cleaning up self-hosted workspace..."
+          Remove-Item -Path * -Recurse -Force -ErrorAction SilentlyContinue

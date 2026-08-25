@@ -33,6 +33,7 @@ jobs:
         working-directory: .\openbao
         run: |
           Write-Output "Currently running in: $(Get-Location)"
+          $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
           docker compose up -d
       - name: Post-run workspace cleanup
         if: always()

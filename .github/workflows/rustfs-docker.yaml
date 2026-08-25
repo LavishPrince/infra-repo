@@ -1,4 +1,4 @@
-name: Openbao Docker Container
+name: RustFS Docker Container
 
 on:
   push:

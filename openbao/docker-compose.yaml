@@ -21,7 +21,7 @@ services:
 volumes:
   openbao_data:
     external: true
-    name: openbao_
+    name: openbao_data
   openbao_logs:
     external: true
     name: openbao_logs

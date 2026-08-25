@@ -8,6 +8,9 @@ on:
 jobs:
   check-and-unseal:
     runs-on: [self-hosted, Windows, X64] # Assumes your Windows machine is the self-hosted runner
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
 
     steps:
       - name: Check Seal Status

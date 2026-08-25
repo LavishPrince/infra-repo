@@ -35,7 +35,7 @@ jobs:
           RUSTFS_ACCESS_KEY: ${{ secrets.RUSTFS_ACCESS_KEY }}
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          docker compose up -d
+          docker compose -p rustfs up -d
       - name: Post-run workspace cleanup
         if: always()
         run: |

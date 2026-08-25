@@ -33,7 +33,7 @@ jobs:
         working-directory: .\openbao
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          docker compose up -d
+          docker compose -p openbao up -d
       - name: Post-run workspace cleanup
         if: always()
         run: |

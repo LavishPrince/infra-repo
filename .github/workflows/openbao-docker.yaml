@@ -1,0 +1,37 @@
+name: Openbao Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'openbao/docker-compose.yaml'
+      - 'openbao/config/**'
+  workflow_dispatch:
+
+
+jobs:
+  bring-up-openbao:
+    runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+
+    steps:
+      # Clone only the specific path from that branch (Sparse Checkout)
+      - name: Checkout specific path
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          sparse-checkout: |
+            openbao
+          sparse-checkout-cone-mode: true
+
+      # Run your Windows command inside the target folder
+      - name: Run command in path
+        working-directory: .\openbao
+        run: |
+          Write-Output "Currently running in: $(Get-Location)"
+          docker compose up -d
+          - name: Post-run workspace cleanup
+            if: always()
+            run: |
+              Write-Output "Cleaning up self-hosted workspace..."
+              Remove-Item -Path * -Recurforce -Force -ErrorAction SilentlyContinue

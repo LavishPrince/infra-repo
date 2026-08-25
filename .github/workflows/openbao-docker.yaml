@@ -31,8 +31,8 @@ jobs:
         run: |
           Write-Output "Currently running in: $(Get-Location)"
           docker compose up -d
-          - name: Post-run workspace cleanup
-            if: always()
-            run: |
-              Write-Output "Cleaning up self-hosted workspace..."
-              Remove-Item -Path * -Recurforce -Force -ErrorAction SilentlyContinue
+      - name: Post-run workspace cleanup
+        if: always()
+        run: |
+          Write-Output "Cleaning up self-hosted workspace..."
+          Remove-Item -Path * -Recurforce -Force -ErrorAction SilentlyContinue

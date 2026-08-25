@@ -1,0 +1,50 @@
+name: Auto Unseal OpenBao (Windows)
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-and-unseal:
+    runs-on: [self-hosted, Windows, X64] # Assumes your Windows machine is the self-hosted runner
+
+    steps:
+      - name: Check Seal Status
+        id: check_status
+        shell: powershell
+        run: |
+          # Fetch seal status and parse the JSON response
+          $response = Invoke-RestMethod -Uri "http://localhost:8200/v1/sys/seal-status" -Method Get
+          $isSealed = $response.sealed.ToString().ToLower()
+
+          Write-Output "Is OpenBao sealed? $isSealed"
+          echo "sealed=$isSealed" >> $env:GITHUB_OUTPUT
+
+      - name: Unseal OpenBao if Sealed
+        if: steps.check_status.outputs.sealed == 'true'
+        shell: powershell
+        env:
+          OPENBAO_UNSEAL_KEY_1: ${{ secrets.OPENBAO_UNSEAL_KEY_1 }}
+          OPENBAO_UNSEAL_KEY_2: ${{ secrets.OPENBAO_UNSEAL_KEY_2 }}
+          OPENBAO_UNSEAL_KEY_3: ${{ secrets.OPENBAO_UNSEAL_KEY_3 }}
+        run: |
+          Write-Output "OpenBao is sealed. Starting unseal process..."
+
+          # Create an array of keys from the environment variables
+          $keys = @($env:OPENBAO_UNSEAL_KEY_1, $env:OPENBAO_UNSEAL_KEY_2, $env:OPENBAO_UNSEAL_KEY_3)
+
+          foreach ($key in $keys) {
+              if (-not [string]::IsNullOrEmpty($key)) {
+                  # Prepare JSON payload and send PUT request
+                  $body = @{ key = $key } | ConvertTo-Json
+                  Invoke-RestMethod -Uri "http://localhost:8200/v1/sys/unseal" -Method Put -Body $body -ContentType "application/json"
+              }
+          }
+
+      - name: Final Status Log
+        if: steps.check_status.outputs.sealed == 'true'
+        shell: powershell
+        run: |
+          Write-Output "Verification after unseal attempt:"
+          Invoke-RestMethod -Uri "http://localhost:8200/v1/sys/seal-status" -Method Get | ConvertTo-Json

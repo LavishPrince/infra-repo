@@ -15,7 +15,6 @@ jobs:
     steps:
       - name: Check Seal Status
         id: check_status
-        shell: powershell
         run: |
           # Fetch seal status and parse the JSON response
           $response = Invoke-RestMethod -Uri "http://localhost:8200/v1/sys/seal-status" -Method Get
@@ -26,7 +25,6 @@ jobs:
 
       - name: Unseal OpenBao if Sealed
         if: steps.check_status.outputs.sealed == 'true'
-        shell: powershell
         env:
           OPENBAO_UNSEAL_KEY_1: ${{ secrets.OPENBAO_UNSEAL_KEY_1 }}
           OPENBAO_UNSEAL_KEY_2: ${{ secrets.OPENBAO_UNSEAL_KEY_2 }}
@@ -47,7 +45,6 @@ jobs:
 
       - name: Final Status Log
         if: steps.check_status.outputs.sealed == 'true'
-        shell: powershell
         run: |
           Write-Output "Verification after unseal attempt:"
           Invoke-RestMethod -Uri "http://localhost:8200/v1/sys/seal-status" -Method Get | ConvertTo-Json

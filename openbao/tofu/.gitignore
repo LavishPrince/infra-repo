@@ -1,0 +1,24 @@
+# Local .terraform directories
+.terraform/
+
+# State files (contain sensitive data)
+*.tfstate
+*.tfstate.*
+
+# Secret variable files
+*.tfvars
+*.tfvars.json
+
+# Local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Transient lock and configuration files
+.terraform.tfstate.lock.info
+.terraformrc
+terraform.rc
+
+# Plan output files
+*tfplan*

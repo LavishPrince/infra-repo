@@ -1,0 +1,73 @@
+name: Openbao Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'openbao/tofu/**'
+      - '.github/workflows/openbao-tofu.yaml'
+  workflow_dispatch:
+
+
+jobs:
+  bring-up-openbao:
+    runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      # Clone only the specific path from that branch (Sparse Checkout)
+      - name: Checkout specific path
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          sparse-checkout: |
+            openbao
+          sparse-checkout-cone-mode: true
+
+
+      - name: Fetch OpenBao Token
+        id: bao-auth
+        run: |
+          # 1. Request the OIDC JWT token from GitHub
+          ACTIONS_JWT=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://github.com" \
+            | jq -r '.value')
+          
+          # 2. Authenticate with OpenBao using the JWT token
+          # Replace BAO_ADDR and your_role_name with your actual OpenBao setup
+          BAO_TOKEN=$(curl --request POST \
+            --url "https//localhost:8200" \
+            --data "{\"jwt\": \"$ACTIONS_JWT\", \"role\": \"openbao-manager\"}" \
+            | jq -r '.auth.client_token')
+          
+          # 3. Mask the token in logs for security
+          echo "::add-mask::$BAO_TOKEN"
+          
+          # 4. Save the token to the GitHub Actions Environment variable
+          echo "VAULT_TOKEN=$BAO_TOKEN" >> $GITHUB_ENV
+      # Run your Windows command inside the target folder
+      - name: Run command in path
+        working-directory: .\openbao\tofu
+        env:
+          TF_VAR_pwd_postgres_01: ${{ secrets.TF_VAR_PWD_POSTGRES_01 }}
+          TF_VAR_pwd_postgres_02: ${{ secrets.TF_VAR_PWD_POSTGRES_02 }}
+          TF_VAR_vinay_dg_password: ${{ secrets.TF_VAR_VINAY_DG_PASSWORD }}
+          TF_VAR_vinay_password: ${{ secrets.TF_VAR_VINAY_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          VAULT_ADDR: "http://localhost:8200"
+        run: |
+          Write-Output "Currently running in: $(Get-Location)"
+          tofu init
+          tofu plan
+          tofu apply
+      - name: Post-run workspace cleanup
+        if: always()
+        run: |
+          Write-Output "Cleaning up self-hosted workspace..."
+          Remove-Item -Path * -Recurse -Force -ErrorAction SilentlyContinue

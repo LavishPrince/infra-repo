@@ -22,6 +22,10 @@ path "${var.namespace_path}/sys/*" {
 path "${var.namespace_path}/auth/${vault_jwt_auth_backend.github.path}/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
+path "${var.namespace_path}/transit/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
 EOT
 }
 
@@ -29,7 +33,7 @@ EOT
 resource "vault_jwt_auth_backend_role" "tofu_management" {
   backend        = vault_jwt_auth_backend.github.path
   role_name      = "opentofu-manager"
-  token_policies = [vault_policy.tofu_management.name, var.state_transit_key_policy]
+  token_policies = [vault_policy.tofu_management.name]
 
   bound_claims = {
     repository = "${var.github_organization}/${var.management_repo}"

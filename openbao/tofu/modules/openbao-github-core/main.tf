@@ -1,5 +1,6 @@
 # Enable JWT Authentication Backend for GitHub Actions OIDC (Once per namespace)
 resource "vault_jwt_auth_backend" "github" {
+  namespace = var.namespace_path
   path               = "github"
   type               = "jwt"
   oidc_discovery_url = "https://token.actions.githubusercontent.com"
@@ -8,6 +9,7 @@ resource "vault_jwt_auth_backend" "github" {
 
 # Policy allowing complete configuration management inside the namespace
 resource "vault_policy" "tofu_management" {
+  namespace = var.namespace_path
   name      = "opentofu-management"
   policy    = <<EOT
 path "${var.namespace_path}/metadata/*" {
@@ -34,6 +36,7 @@ EOT
 
 # Map GitHub OIDC claims to the Management Policy
 resource "vault_jwt_auth_backend_role" "tofu_management" {
+  namespace = var.namespace_path
   backend        = vault_jwt_auth_backend.github.path
   role_name      = "opentofu-manager"
   token_policies = [vault_policy.tofu_management.name]

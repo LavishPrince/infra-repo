@@ -11,7 +11,7 @@ on:
 
 
 jobs:
-  bring-up-openbao:
+  bring-up-rustfs:
     runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
     defaults:
       run:

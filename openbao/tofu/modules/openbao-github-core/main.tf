@@ -25,6 +25,9 @@ path "${var.namespace_path}/auth/${vault_jwt_auth_backend.github.path}/*" {
 path "${var.namespace_path}/transit/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
+path "auth/${vault_jwt_auth_backend.github.path}/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
 
 EOT
 }

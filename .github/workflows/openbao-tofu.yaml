@@ -48,7 +48,7 @@ jobs:
               "X-Vault-Request" = "true"
           }
           $response = Invoke-RestMethod `
-            -Uri "http://localhost:8200/v1/auth/jwt/login" `
+            -Uri "http://localhost:8200/v1/auth/github/login" `
             -Method POST `
             -Headers $Headers `
             -ContentType "application/json" `

@@ -34,7 +34,7 @@ jobs:
         id: github-oidc
         run: |
           $response = Invoke-RestMethod `
-            -Uri "$env:ACTIONS_ID_TOKEN_REQUEST_URL&audience=openbao" `
+            -Uri "$env:ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://github.com" `
             -Headers @{ Authorization = "bearer $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN"; Accept = "application/json" }
           $token = $response.value
           Write-Output "::add-mask::$token"

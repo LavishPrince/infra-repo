@@ -39,7 +39,7 @@ resource "vault_jwt_auth_backend_role" "tofu_management" {
   namespace = var.namespace_path
   backend        = vault_jwt_auth_backend.github.path
   role_name      = "opentofu-manager"
-  token_policies = [vault_policy.tofu_management.name]
+  token_policies = [vault_policy.tofu_management.name, "opentofu-state-encryption"]
   bound_audiences = ["https://github.com"]
   bound_claims_type = "glob"
   bound_claims = {

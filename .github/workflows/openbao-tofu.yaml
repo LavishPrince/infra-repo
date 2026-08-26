@@ -32,7 +32,6 @@ jobs:
 
       - name: Get GitHub OIDC token
         id: github-oidc
-        shell: powershell
         run: |
           $response = Invoke-RestMethod `
             -Uri "$env:ACTIONS_ID_TOKEN_REQUEST_URL&audience=openbao" `
@@ -43,7 +42,6 @@ jobs:
  
       - name: Authenticate with OpenBao
         id: bao-auth
-        shell: powershell
         run: |
           $body = @{ role = "opentofu-manager"; jwt = "${{ steps.github-oidc.outputs.oidc_token }}" } | ConvertTo-Json
           $response = Invoke-RestMethod `

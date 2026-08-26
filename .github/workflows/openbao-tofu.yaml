@@ -1,4 +1,4 @@
-name: Openbao Docker Container
+name: Openbao Opentofu Run
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 
 jobs:
-  bring-up-openbao:
+  manage-openbao:
     runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
     defaults:
       run:
@@ -32,6 +32,10 @@ jobs:
 
       - name: Fetch OpenBao Token
         id: bao-auth
+        env:
+          # Explicitly map GitHub's internal OIDC variables so PowerShell can see them
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
+          ACTIONS_ID_TOKEN_REQUEST_URL: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_URL }}
         run: |
           # 1. Request the OIDC JWT token from GitHub
           $headers = @{ Authorization = "bearer $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN" }
@@ -39,15 +43,20 @@ jobs:
           $ACTIONS_JWT = $response.value
 
           # 2. Authenticate with OpenBao using the JWT token
-          $body = @{ jwt = $ACTIONS_JWT; role = "openbao-manager" } | ConvertTo-Json
+          # !!! REPLACE 'your_role_name' and the URL with your actual values !!!
+          $body = @{ jwt = $ACTIONS_JWT; role = "your_role_name" } | ConvertTo-Json
           $baoResponse = Invoke-RestMethod -Method Post -Uri "http://localhost:8200" -Body $body -ContentType "application/json"
           $BAO_TOKEN = $baoResponse.auth.client_token
 
-          # 3. Mask the token in logs for security
-          Write-Output "::add-mask::$BAO_TOKEN"
-
-          # 4. Save the token to the GitHub Actions Environment variable
-          Add-Content -Path $env:GITHUB_ENV -Value "VAULT_TOKEN=$BAO_TOKEN"
+          # 3. Mask and save the token if it was successfully retrieved
+          if (-not [string]::IsNullOrEmpty($BAO_TOKEN)) {
+              Write-Output "::add-mask::$BAO_TOKEN"
+              Add-Content -Path $env:GITHUB_ENV -Value "VAULT_TOKEN=$BAO_TOKEN"
+              Write-Output "Successfully authenticated and saved BAO_TOKEN."
+          } else {
+              Write-Error "Failed to retrieve OpenBao token. Server response was empty."
+              exit 1
+          }
       # Run your Windows command inside the target folder
       - name: Run command in path
         working-directory: .\openbao\tofu

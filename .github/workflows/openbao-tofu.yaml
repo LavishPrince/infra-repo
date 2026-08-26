@@ -44,9 +44,13 @@ jobs:
         id: bao-auth
         run: |
           $body = @{ role = "opentofu-manager"; jwt = "${{ steps.github-oidc.outputs.oidc_token }}" } | ConvertTo-Json
+          $Headers = @{
+              "X-Vault-Request" = "true"
+          }
           $response = Invoke-RestMethod `
             -Uri "http://localhost:8200/v1/auth/jwt/login" `
             -Method POST `
+            -Headers $Headers `
             -ContentType "application/json" `
             -Body $body
           $baoToken = $response.auth.client_token

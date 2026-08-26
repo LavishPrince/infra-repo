@@ -44,7 +44,7 @@ jobs:
 
           # 2. Authenticate with OpenBao using the JWT token
           # !!! REPLACE 'your_role_name' and the URL with your actual values !!!
-          $body = @{ jwt = $ACTIONS_JWT; role = "your_role_name" } | ConvertTo-Json
+          $body = @{ jwt = $ACTIONS_JWT; role = "opentofu-manager" } | ConvertTo-Json
           $baoResponse = Invoke-RestMethod -Method Post -Uri "http://localhost:8200" -Body $body -ContentType "application/json"
           $BAO_TOKEN = $baoResponse.auth.client_token
 

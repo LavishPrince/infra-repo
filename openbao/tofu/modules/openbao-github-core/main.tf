@@ -13,12 +13,16 @@ resource "vault_policy" "tofu_management" {
   path "sys/namespaces/${var.namespace_path}" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"]
   }
-  
+
   # Allow full control over anything inside the namespace
   path "sys/namespaces/${var.namespace_path}/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"]
   }
   path "auth/${vault_jwt_auth_backend.github.path}/*" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+  }
+
+  path "${var.namespace_path}/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"]
   }
 

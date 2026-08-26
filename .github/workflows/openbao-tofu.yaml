@@ -36,25 +36,55 @@ jobs:
           # Explicitly map GitHub's internal OIDC variables so PowerShell can see them
           ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
           ACTIONS_ID_TOKEN_REQUEST_URL: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_URL }}
+          BAO_ADDR: "http://localhost:8200"
+          BAO_NAMESPACE: "quation-team" # Ensure this matches your OpenBao setup
+          BAO_ROLE: "opentofu-manager"
         run: |
-          # 1. Request the OIDC JWT token from GitHub
-          $headers = @{ Authorization = "bearer $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN" }
-          $response = Invoke-RestMethod -Uri "$($env:ACTIONS_ID_TOKEN_REQUEST_URL)&audience=https://github.com" -Headers $headers
-          $ACTIONS_JWT = $response.value
+          $ActionsToken = $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN
+          if ([string]::IsNullOrEmpty($ActionsToken)) {
+              Write-Error "CRITICAL: GitHub ACTIONS_ID_TOKEN_REQUEST_TOKEN is empty. Verify that 'permissions: id-token: write' is set at the job or workflow level."
+              exit 1
+          }
 
-          # 2. Authenticate with OpenBao using the JWT token
-          # !!! REPLACE 'your_role_name' and the URL with your actual values !!!
-          $body = @{ jwt = $ACTIONS_JWT; role = "opentofu-manager" } | ConvertTo-Json
-          $baoResponse = Invoke-RestMethod -Method Post -Uri "http://localhost:8200" -Body $body -ContentType "application/json"
-          $BAO_TOKEN = $baoResponse.auth.client_token
+          # 3. Construct headers explicitly requiring X-Vault-Request and target Namespace
+          $Headers = @{
+              "X-Vault-Request"   = "true"
+              "X-Vault-Namespace" = "${{ env:BAO_NAMESPACE }}"
+          }
 
-          # 3. Mask and save the token if it was successfully retrieved
-          if (-not [string]::IsNullOrEmpty($BAO_TOKEN)) {
-              Write-Output "::add-mask::$BAO_TOKEN"
-              Add-Content -Path $env:GITHUB_ENV -Value "VAULT_TOKEN=$BAO_TOKEN"
-              Write-Output "Successfully authenticated and saved BAO_TOKEN."
-          } else {
-              Write-Error "Failed to retrieve OpenBao token. Server response was empty."
+          # 4. Construct Payload matching the OpenTofu Role configuration
+          $Body = @{
+              role = "${{ env:BAO_ROLE }}"
+              jwt  = $ActionsToken
+          } | ConvertTo-Json
+
+          # 5. Make the API Call to the JWT Auth Backend Login Route
+          $LoginUrl = "${{ env:BAO_ADDR }}/v1/auth/github/login"
+          Write-Host "Attempting authentication against OpenBao endpoint: $LoginUrl"
+
+          try {
+              $Response = Invoke-RestMethod -Uri $LoginUrl -Method Post -Headers $Headers -Body $Body -ContentType "application/json"
+
+              if ($null -eq $Response -or $null -eq $Response.auth -or [string]::IsNullOrEmpty($Response.auth.client_token)) {
+                  Write-Error "OpenBao authenticated successfully but returned an invalid token structure."
+                  exit 1
+              }
+
+              # 6. Extract token and mask it securely in GitHub Actions logging
+              $BaoToken = $Response.auth.client_token
+              Write-Output "::add-mask::$BaoToken"
+
+              # Set environmental variable for subsequent pipeline stages
+              echo "BAO_TOKEN=$BaoToken" >> $env:GITHUB_ENV
+              Write-Host "Successfully retrieved and registered OpenBao client token."
+
+          } catch {
+              Write-Error "Failed to reach or process login request. Error Details: $_"
+              if ($_.Exception.Response) {
+                  $Reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+                  $ErrorBody = $Reader.ReadToEnd()
+                  Write-Error "Server returned error body: $ErrorBody"
+              }
               exit 1
           }
       # Run your Windows command inside the target folder

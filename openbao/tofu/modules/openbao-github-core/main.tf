@@ -12,19 +12,19 @@ resource "vault_policy" "tofu_management" {
   namespace = var.namespace_path
   name      = "opentofu-management"
   policy    = <<EOT
-path "${var.namespace_path}/metadata/*" {
+path "metadata/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
-path "${var.namespace_path}/data/*" {
+path "data/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
-path "${var.namespace_path}/sys/*" {
+path "sys/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
-path "${var.namespace_path}/transit/*" {
+path "transit/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
-path "${var.namespace_path}/transit/datakey/plaintext/*" {
+path "transit/datakey/plaintext/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 path "auth/${vault_jwt_auth_backend.github.path}/*" {

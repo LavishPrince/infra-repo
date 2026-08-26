@@ -30,63 +30,30 @@ jobs:
           sparse-checkout-cone-mode: true
 
 
-      - name: Fetch OpenBao Token
-        id: bao-auth
-        env:
-          # Explicitly map GitHub's internal OIDC variables so PowerShell can see them
-          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
-          ACTIONS_ID_TOKEN_REQUEST_URL: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_URL }}
-          BAO_ADDR: "http://localhost:8200"
-          BAO_NAMESPACE: "quation-team" # Ensure this matches your OpenBao setup
-          BAO_ROLE: "opentofu-manager"
+      - name: Get GitHub OIDC token
+        id: github-oidc
+        shell: pwsh
         run: |
-          $ActionsToken = $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN
-          if ([string]::IsNullOrEmpty($ActionsToken)) {
-              Write-Error "CRITICAL: GitHub ACTIONS_ID_TOKEN_REQUEST_TOKEN is empty. Verify that 'permissions: id-token: write' is set at the job or workflow level."
-              exit 1
-          }
-
-          # 3. Construct headers explicitly requiring X-Vault-Request and target Namespace
-          $Headers = @{
-              "X-Vault-Request"   = "true"
-              "X-Vault-Namespace" = "${{ env:BAO_NAMESPACE }}"
-          }
-
-          # 4. Construct Payload matching the OpenTofu Role configuration
-          $Body = @{
-              role = "${{ env:BAO_ROLE }}"
-              jwt  = $ActionsToken
-          } | ConvertTo-Json
-
-          # 5. Make the API Call to the JWT Auth Backend Login Route
-          $LoginUrl = "${{ env:BAO_ADDR }}/v1/auth/github/login"
-          Write-Host "Attempting authentication against OpenBao endpoint: $LoginUrl"
-
-          try {
-              $Response = Invoke-RestMethod -Uri $LoginUrl -Method Post -Headers $Headers -Body $Body -ContentType "application/json"
-
-              if ($null -eq $Response -or $null -eq $Response.auth -or [string]::IsNullOrEmpty($Response.auth.client_token)) {
-                  Write-Error "OpenBao authenticated successfully but returned an invalid token structure."
-                  exit 1
-              }
-
-              # 6. Extract token and mask it securely in GitHub Actions logging
-              $BaoToken = $Response.auth.client_token
-              Write-Output "::add-mask::$BaoToken"
-
-              # Set environmental variable for subsequent pipeline stages
-              echo "BAO_TOKEN=$BaoToken" >> $env:GITHUB_ENV
-              Write-Host "Successfully retrieved and registered OpenBao client token."
-
-          } catch {
-              Write-Error "Failed to reach or process login request. Error Details: $_"
-              if ($_.Exception.Response) {
-                  $Reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-                  $ErrorBody = $Reader.ReadToEnd()
-                  Write-Error "Server returned error body: $ErrorBody"
-              }
-              exit 1
-          }
+          $response = Invoke-RestMethod `
+            -Uri "$env:ACTIONS_ID_TOKEN_REQUEST_URL&audience=openbao" `
+            -Headers @{ Authorization = "bearer $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN"; Accept = "application/json" }
+          $token = $response.value
+          Write-Output "::add-mask::$token"
+          "oidc_token=$token" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+ 
+      - name: Authenticate with OpenBao
+        id: bao-auth
+        shell: pwsh
+        run: |
+          $body = @{ role = "opentofu-manager"; jwt = "${{ steps.github-oidc.outputs.oidc_token }}" } | ConvertTo-Json
+          $response = Invoke-RestMethod `
+            -Uri "http://localhost:8200/v1/auth/jwt/login" `
+            -Method POST `
+            -ContentType "application/json" `
+            -Body $body
+          $baoToken = $response.auth.client_token
+          Write-Output "::add-mask::$baoToken"
+          "VAULT_TOKEN=$baoToken" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       # Run your Windows command inside the target folder
       - name: Run command in path
         working-directory: .\openbao\tofu

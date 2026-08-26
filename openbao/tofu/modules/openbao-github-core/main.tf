@@ -38,10 +38,11 @@ resource "vault_jwt_auth_backend_role" "tofu_management" {
   role_name      = "opentofu-manager"
   token_policies = [vault_policy.tofu_management.name]
   bound_audiences = ["https://github.com", "https://token.actions.githubusercontent.com"]
+  bound_claims_type = "glob"
   bound_claims = {
     repository = "${var.github_organization}/${var.management_repo}"
   }
-  user_claim = "job_workflow_ref"
+  user_claim = "sub"
   role_type  = "jwt"
   token_ttl  = 1200
 }

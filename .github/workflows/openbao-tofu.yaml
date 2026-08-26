@@ -46,7 +46,6 @@ jobs:
           $body = @{ role = "opentofu-manager"; jwt = "${{ steps.github-oidc.outputs.oidc_token }}" } | ConvertTo-Json
           $Headers = @{
               "X-Vault-Request" = "true"
-              "X-Vault-Namespace" = "quation-team"
           }
           $response = Invoke-RestMethod `
             -Uri "http://localhost:8200/v1/auth/github/login" `

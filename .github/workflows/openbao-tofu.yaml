@@ -34,22 +34,20 @@ jobs:
         id: bao-auth
         run: |
           # 1. Request the OIDC JWT token from GitHub
-          ACTIONS_JWT=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://github.com" \
-            | jq -r '.value')
-          
+          $headers = @{ Authorization = "bearer $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN" }
+          $response = Invoke-RestMethod -Uri "$($env:ACTIONS_ID_TOKEN_REQUEST_URL)&audience=https://github.com" -Headers $headers
+          $ACTIONS_JWT = $response.value
+
           # 2. Authenticate with OpenBao using the JWT token
-          # Replace BAO_ADDR and your_role_name with your actual OpenBao setup
-          BAO_TOKEN=$(curl --request POST \
-            --url "https//localhost:8200" \
-            --data "{\"jwt\": \"$ACTIONS_JWT\", \"role\": \"openbao-manager\"}" \
-            | jq -r '.auth.client_token')
-          
+          $body = @{ jwt = $ACTIONS_JWT; role = "your_role_name" } | ConvertTo-Json
+          $baoResponse = Invoke-RestMethod -Method Post -Uri "https://your-openbao-server.com" -Body $body -ContentType "application/json"
+          $BAO_TOKEN = $baoResponse.auth.client_token
+
           # 3. Mask the token in logs for security
-          echo "::add-mask::$BAO_TOKEN"
-          
+          Write-Output "::add-mask::$BAO_TOKEN"
+
           # 4. Save the token to the GitHub Actions Environment variable
-          echo "VAULT_TOKEN=$BAO_TOKEN" >> $GITHUB_ENV
+          Add-Content -Path $env:GITHUB_ENV -Value "VAULT_TOKEN=$BAO_TOKEN"
       # Run your Windows command inside the target folder
       - name: Run command in path
         working-directory: .\openbao\tofu

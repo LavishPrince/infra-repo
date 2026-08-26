@@ -1,0 +1,45 @@
+services:
+  postgres-01:
+    image: postgres:18-alpine
+    container_name: postgres_01
+    environment:
+      - POSTGRES_PASSWORD=${TF_VAR_pwd_postgres_01}
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_01
+      - openbao
+    volumes:
+      - postgres_01:/var/lib/postgresql
+    command: ["postgres", "-c", "max_connections=250"]
+
+  postgres-02:
+    image: postgres:18-alpine
+    container_name: postgres_02
+    environment:
+      - POSTGRES_PASSWORD=${TF_VAR_pwd_postgres_01}
+    networks:
+      - postgres_02
+      - openbao
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_02:/var/lib/postgresql
+    command: ["postgres", "-c", "max_connections=250"]
+
+networks:
+  postgres_01:
+    external: true
+    name: postgres_02
+  postgres_02:
+    external: true
+    name: postgres_02
+  openbao:
+    external: true
+    name: openbao
+
+volumes:
+  postgres_01:
+    external: true
+  postgres_02:
+    external: true

@@ -17,7 +17,7 @@ services:
     image: postgres:18-alpine
     container_name: postgres_02
     environment:
-      - POSTGRES_PASSWORD=${TF_VAR_pwd_postgres_01}
+      - POSTGRES_PASSWORD=${TF_VAR_pwd_postgres_02}
     networks:
       - postgres_02
       - openbao

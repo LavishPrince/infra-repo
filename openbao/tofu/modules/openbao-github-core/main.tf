@@ -19,9 +19,6 @@ path "${var.namespace_path}/data/*" {
 path "${var.namespace_path}/sys/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
-path "${var.namespace_path}/auth/${vault_jwt_auth_backend.github.path}/*" {
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
 path "${var.namespace_path}/transit/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }

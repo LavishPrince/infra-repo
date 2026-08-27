@@ -1,0 +1,5 @@
+**/.env
+.env
+openbao_data
+openbao_file
+openbao_logs

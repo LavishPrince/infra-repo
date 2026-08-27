@@ -1,6 +1,5 @@
 # 1. Enable Userpass Auth Method
 resource "vault_auth_backend" "userpass" {
-  namespace   = var.namespace
   type        = "userpass"
   path        = "userpass"
   description = "Userpass auth backend inside custom namespace"
@@ -8,7 +7,6 @@ resource "vault_auth_backend" "userpass" {
 
 # 2. Dynamically create Identity Entities for all users
 resource "vault_identity_entity" "users" {
-  namespace = var.namespace
   for_each  = var.user_data
   name     = each.key
   policies = ["default"]
@@ -16,7 +14,6 @@ resource "vault_identity_entity" "users" {
 
 # 3. Create Userpass Credentials for all users
 resource "vault_generic_endpoint" "userpass_users" {
-  namespace  = var.namespace
   for_each   = var.user_data
   depends_on           = [vault_auth_backend.userpass]
 path                 = "auth/userpass/users/${each.key}"
@@ -27,7 +24,6 @@ data_json = jsonencode({
 
 # 4. Link each Userpass Login to its corresponding Identity Entity
 resource "vault_identity_entity_alias" "user_aliases" {
-  namespace = var.namespace
   for_each  = var.user_data
   name           = each.key
   mount_accessor = vault_auth_backend.userpass.accessor
@@ -47,7 +43,6 @@ for item in local.static_flat : item.group_key => item.username...   }
 
 # 6. Assign Users to Groups safely
 resource "vault_identity_group_member_entity_ids" "membership" {
-  namespace = var.namespace
   for_each  = local.group_to_usernames # 100% static structural keys, OpenTofu knows these!
   # Resolve the dynamic Group UUID using our lookup variable during apply
   group_id  = var.group_ids_lookup[each.key]

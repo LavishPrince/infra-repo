@@ -1,8 +1,3 @@
-variable "namespace_path" {
-  type        = string
-  description = "The target OpenBao namespace path passed from the root configuration"
-}
-
 variable "mount_path" {
   type        = string
   description = "Name/path of the KV mount inside the namespace"

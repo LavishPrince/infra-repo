@@ -9,7 +9,6 @@ variable "pwd_postgres_02" {
 
 module "db_billing_payments" {
   source          = "./modules/openbao-database-instance"
-  namespace_path  = var.namespace
   connection_name = "postgres_01"
   admin_username  = "postgres"
 
@@ -22,7 +21,6 @@ module "db_billing_payments" {
 
 module "db_billing_invoices" {
   source          = "./modules/openbao-database-instance"
-  namespace_path  = var.namespace
   connection_name = "postgres_02"
   admin_username  = "postgres"
 

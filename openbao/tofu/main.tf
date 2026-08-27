@@ -15,7 +15,7 @@ terraform {
 
   encryption {
     key_provider "openbao" "my_bao" {
-      transit_engine_path = "quation/transit"
+      transit_engine_path = "transit"
       key_name            = "tofu-state-key"
 
     }

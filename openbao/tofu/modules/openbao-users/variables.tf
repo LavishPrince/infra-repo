@@ -1,8 +1,3 @@
-variable "namespace" {
-  type        = string
-  description = "The target OpenBao namespace"
-}
-
 variable "user_data" {
   type = map(object({
     password = string

@@ -14,7 +14,6 @@ variable "vinay_password" {
 
 module "user_creation" {
   source    = "./modules/openbao-users"
-  namespace = var.namespace
 
   user_data = {
     "vinay_dg" = { password = var.vinay_dg_password }

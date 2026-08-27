@@ -2,13 +2,11 @@
 resource "vault_mount" "transit" {
   path        = "transit"
   type        = "transit"
-  namespace   = var.namespace
   description = "Transit secrets engine for OpenTofu state client-side encryption"
 }
 
 # 2. Create the encryption key for your state files
 resource "vault_transit_secret_backend_key" "tofu_state_key" {
-  namespace        = var.namespace
   backend          = vault_mount.transit.path
   name             = "tofu-state-key"
   type             = "aes256-gcm96" # Recommended GCM type for OpenTofu state
@@ -18,7 +16,6 @@ resource "vault_transit_secret_backend_key" "tofu_state_key" {
 # 3. Create a restrictive access policy for OpenTofu workers
 resource "vault_policy" "tofu_encryption_policy" {
   name      = "opentofu-state-encryption"
-  namespace = var.namespace
 
   policy = <<EOT
 # Allow OpenTofu to encrypt and decrypt its state payload

@@ -1,8 +1,3 @@
-variable "namespace_path" {
-  type        = string
-  description = "The target namespace where this database should live."
-}
-
 variable "connection_name" {
   type        = string
   description = "A unique tracking name for this OpenBao connection backend (e.g., 'billing-payments')."

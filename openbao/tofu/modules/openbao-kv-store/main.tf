@@ -1,6 +1,5 @@
 # 1. Mount KV V2 inside the passed namespace
 resource "vault_mount" "kv" {
-  namespace   = var.namespace_path
   path        = var.mount_path
   type        = "kv"
   options     = { version = "2" }
@@ -26,7 +25,6 @@ locals {
 resource "vault_kv_secret_v2" "branch_placeholder" {
   for_each  = { for item in local.project_branch_pairs : item.path => item }
 
-  namespace = var.namespace_path
   mount     = vault_mount.kv.path
   name      = each.value.path
   data_json = jsonencode({
@@ -38,7 +36,6 @@ resource "vault_kv_secret_v2" "branch_placeholder" {
 
 # 4. Enable AppRole Auth Backend inside the passed namespace
 resource "vault_auth_backend" "approle" {
-  namespace = var.namespace_path
   type      = "approle"
   path      = "approle"
 }
@@ -46,7 +43,6 @@ resource "vault_auth_backend" "approle" {
 # 5. Project CRUD Policies inside the passed namespace
 resource "vault_policy" "project_crud" {
   for_each  = toset(local.projects)
-  namespace = var.namespace_path
   name      = "${each.key}-crud"
 
   policy = <<EOT
@@ -64,7 +60,6 @@ EOT
 # 6. Project Read-Only Policies inside the passed namespace
 resource "vault_policy" "project_read" {
   for_each  = toset(local.projects)
-  namespace = var.namespace_path
   name      = "${each.key}-read"
 
   policy = <<EOT
@@ -81,7 +76,6 @@ EOT
 # 7. Bind Read-Only AppRoles inside the passed namespace
 resource "vault_approle_auth_backend_role" "read_role" {
   for_each       = toset(local.projects)
-  namespace      = var.namespace_path
   backend        = vault_auth_backend.approle.path
   role_name      = "${each.key}-read-role"
   token_policies = [vault_policy.project_read[each.key].name]

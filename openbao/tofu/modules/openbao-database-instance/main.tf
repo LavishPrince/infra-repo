@@ -1,7 +1,6 @@
 # 1. Mount a dedicated database backend for this specific connection.
 # Splitting mounts ensures complete engine-level isolation per database instance.
 resource "vault_mount" "db" {
-  namespace   = var.namespace_path
   path        = "database-${var.connection_name}"
   type        = "database"
   description = "Dynamic credentials engine for ${var.connection_name}"
@@ -9,7 +8,6 @@ resource "vault_mount" "db" {
 
 # 2. Configure OpenBao's connection to this specific PostgreSQL targets
 resource "vault_database_secret_backend_connection" "postgres" {
-  namespace     = var.namespace_path
   backend       = vault_mount.db.path
   name          = "conn-${var.connection_name}"
   allowed_roles = flatten([
@@ -30,7 +28,6 @@ resource "vault_database_secret_backend_connection" "postgres" {
 resource "vault_database_secret_backend_role" "webapp" {
   for_each = var.schema_names
 
-  namespace   = var.namespace_path
   backend     = vault_mount.db.path
   name        = "role-${var.connection_name}-${each.value}"
   db_name     = vault_database_secret_backend_connection.postgres.name
@@ -52,7 +49,6 @@ resource "vault_database_secret_backend_role" "webapp" {
 resource "vault_database_secret_backend_role" "read_only" {
   for_each = var.schema_names
 
-  namespace   = var.namespace_path
   backend     = vault_mount.db.path
   name        = "role-${var.connection_name}-${each.value}-read-only"
   db_name     = vault_database_secret_backend_connection.postgres.name

@@ -1,6 +1,6 @@
 services:
   openbao:
-    image: openbao/openbao:latest
+    build: .
     container_name: openbao
     ports:
       - "8200:8200"

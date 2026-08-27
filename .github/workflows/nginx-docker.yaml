@@ -11,7 +11,7 @@ on:
 
 
 jobs:
-  bring-up-databases:
+  bring-up-nginx:
     runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
     defaults:
       run:

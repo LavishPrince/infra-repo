@@ -5,8 +5,8 @@ on:
     branches:
       - 'main'
     paths:
-      - 'nginx/docker-compose.yaml'
-      - '.github/workflows/nginx-docker.yaml'
+      - 'kuma/docker-compose.yaml'
+      - '.github/workflows/kuma-docker.yaml'
   workflow_dispatch:
 
 
@@ -24,16 +24,15 @@ jobs:
         with:
           ref: 'main'
           sparse-checkout: |
-            nginx
+            kuma
           sparse-checkout-cone-mode: true
 
       # Run your Windows command inside the target folder
       - name: Run command in path
-        working-directory: .\nginx
+        working-directory: .\kuma
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          docker compose -p nginx up -d
-          docker compose exec nginx-proxy nginx -s reload
+          docker compose -p kuma up -d
       - name: Post-run workspace cleanup
         if: always()
         run: |

@@ -73,8 +73,8 @@ jobs:
         run: |
           Write-Output "Currently running in: $(Get-Location)"
           tofu init
-          tofu plan
-          tofu apply
+          tofu plan -out=tfplan
+          tofu apply -auto-approve tfplan
       - name: Post-run workspace cleanup
         if: always()
         run: |

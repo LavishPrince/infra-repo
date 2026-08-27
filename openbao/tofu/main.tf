@@ -15,7 +15,7 @@ terraform {
 
   encryption {
     key_provider "openbao" "my_bao" {
-      transit_engine_path = "quation-team/transit"
+      transit_engine_path = "quation/transit"
       key_name            = "tofu-state-key"
 
     }
@@ -24,11 +24,18 @@ terraform {
       keys = key_provider.openbao.my_bao
     }
 
-
+    # method "unencrypted" "fallback" {}
+  
+    # state {
+    #   # 2. Add the fallback method to the list
+    #   method   = method.aes_gcm.bao_method
+    #   fallback { 
+    #     method = method.unencrypted.fallback 
+    #   }
+    # }
     state {
       method   = method.aes_gcm.bao_method
       enforced = true
-
     }
 
     # Optional: Encrypt your plan files with the same key
@@ -42,7 +49,9 @@ provider "vault" {
   # Configure via VAULT_ADDR and VAULT_TOKEN env variables
 }
 
-module "bao_namespace" {
-  source         = "./modules/openbao-namespace"
-  namespace_path = "quation-team"
+variable "namespace" {
+  type        = string
+  description = "namespace where the secrets are configured"
+  default     = "quation"
 }
+

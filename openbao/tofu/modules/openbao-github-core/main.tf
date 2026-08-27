@@ -2,6 +2,7 @@
 resource "vault_jwt_auth_backend" "github" {
   path               = "github"
   type               = "jwt"
+  namespace = var.namespace_path
   oidc_discovery_url = "https://token.actions.githubusercontent.com"
   bound_issuer       = "https://token.actions.githubusercontent.com"
 }
@@ -9,20 +10,9 @@ resource "vault_jwt_auth_backend" "github" {
 # Policy allowing complete configuration management inside the namespace
 resource "vault_policy" "tofu_management" {
   name      = "opentofu-management"
+  namespace = var.namespace_path
   policy    = <<EOT
-  path "sys/namespaces/${var.namespace_path}" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-  }
-
-  # Allow full control over anything inside the namespace
-  path "sys/namespaces/${var.namespace_path}/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-  }
-  path "auth/${vault_jwt_auth_backend.github.path}/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-  }
-
-  path "${var.namespace_path}/*" {
+  path "*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"]
   }
 
@@ -32,6 +22,7 @@ EOT
 # Map GitHub OIDC claims to the Management Policy
 resource "vault_jwt_auth_backend_role" "tofu_management" {
   backend        = vault_jwt_auth_backend.github.path
+  namespace = var.namespace_path
   role_name      = "opentofu-manager"
   token_policies = [vault_policy.tofu_management.name, "opentofu-state-encryption"]
   bound_audiences = ["https://github.com"]

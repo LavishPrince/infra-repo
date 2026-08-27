@@ -1,6 +1,7 @@
 services:
   postgres-01:
     image: postgres:18-alpine
+    restart: unless-stopped
     container_name: postgres_01
     environment:
       - POSTGRES_PASSWORD=${TF_VAR_pwd_postgres_01}
@@ -15,6 +16,7 @@ services:
 
   postgres-02:
     image: postgres:18-alpine
+    restart: unless-stopped
     container_name: postgres_02
     environment:
       - POSTGRES_PASSWORD=${TF_VAR_pwd_postgres_02}

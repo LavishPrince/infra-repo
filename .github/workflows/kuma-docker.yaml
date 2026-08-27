@@ -1,4 +1,4 @@
-name: Nginx Docker Container
+name: Kuma Docker Container
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 
 jobs:
-  bring-up-nginx:
+  bring-up-kuma:
     runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
     defaults:
       run:

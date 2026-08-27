@@ -19,6 +19,10 @@ resource "vault_policy" "tofu_encryption_policy" {
 
   policy = <<EOT
 # Allow OpenTofu to encrypt and decrypt its state payload
+path "${vault_mount.transit.path}/datakey/plaintext/${vault_transit_secret_backend_key.tofu_state_key.name}" {
+  capabilities = ["update"]
+}
+
 path "${vault_mount.transit.path}/encrypt/${vault_transit_secret_backend_key.tofu_state_key.name}" {
   capabilities = ["update"]
 }

@@ -6,7 +6,6 @@ services:
       - "8200:8200"
     restart: unless-stopped
     volumes:
-      - ./config:/openbao/config:ro
       - openbao_data:/openbao/data
       - openbao_logs:/openbao/logs
       - openbao_file:/openbao/file

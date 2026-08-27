@@ -1,13 +1,10 @@
 # docker exec nginx-reverse-proxy nginx -s reload
 services:
   nginx-proxy:
-    image: nginx:alpine
+    build: .
     container_name: nginx-reverse-proxy
     ports:
       - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./sites-enabled:/etc/nginx/sites-enabled:ro
     networks:
       - nginx_reverse_proxy
     restart: always

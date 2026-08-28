@@ -37,7 +37,7 @@ jobs:
           GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          docker compose -p monitoring up -d
+          docker compose -p monitoring up -d --build
       - name: Post-run workspace cleanup
         if: always()
         run: |

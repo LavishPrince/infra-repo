@@ -35,7 +35,7 @@ if ($Service) {
     
     Write-Host "Executing MSI Installer..."
     # FIXED: Added /L*V to log any errors to your active monitoring folder
-    $Arguments = "/i `"$DownloadPath`" ENABLED_COLLECTORS=`"cpu,logical_disk,net,os,system,memory`" /qn /norestart /L*V `"$LogPath`""
+    $Arguments = "/i `"$DownloadPath`" ENABLED_COLLECTORS=`"ad,adfs,cache,cpu,cpu_info,container,dfsr,dhcp,dns,fsrmquota,iis,logical_disk,logon,memory,msmq,mssql,netframework_clrexceptions,netframework_clrinterop,netframework_clrjit,netframework_clrloading,netframework_clrlocksandthreads,netframework_clrmemory,netframework_clrremoting,netframework_clrsecurity,net,os,process,remote_fx,service,tcp,time,vmware`" /qn /norestart /L*V `"$LogPath`""
     
     # FIXED: Removed conflicting -Verb parameter to resolve the parameter set error
     Start-Process -FilePath "msiexec.exe" -ArgumentList $Arguments -Wait -NoNewWindow -PassThru

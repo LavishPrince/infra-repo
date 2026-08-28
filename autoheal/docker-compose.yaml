@@ -1,0 +1,11 @@
+services:
+  autoheal:
+    image: willfarrell/autoheal:latest
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal     # watch containers with this label
+      AUTOHEAL_INTERVAL: 10                  # check every 10s
+      AUTOHEAL_START_PERIOD: 30              # ignore unhealthy during first 30s
+      AUTOHEAL_DEFAULT_STOP_TIMEOUT: 10      # give app 10s to stop gracefully
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock  # needs Docker socket access

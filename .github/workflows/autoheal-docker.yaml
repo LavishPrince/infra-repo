@@ -1,0 +1,40 @@
+name: Autoheal Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'autoheal/docker-compose.yaml'
+      - '.github/workflows/autoheal-docker.yaml'
+  workflow_dispatch:
+
+
+jobs:
+  bring-up-autoheal:
+    runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
+
+    steps:
+      # Clone only the specific path from that branch (Sparse Checkout)
+      - name: Checkout specific path
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          sparse-checkout: |
+            autoheal
+          sparse-checkout-cone-mode: true
+
+      # Run your Windows command inside the target folder
+      - name: Run command in path
+        working-directory: .\autoheal
+        run: |
+          Write-Output "Currently running in: $(Get-Location)"
+          docker compose -p autoheal up -d
+      - name: Post-run workspace cleanup
+        if: always()
+        run: |
+          Write-Output "Cleaning up self-hosted workspace..."
+          Remove-Item -Path * -Recurse -Force -ErrorAction SilentlyContinue

@@ -1,0 +1,45 @@
+name: Monitoring Docker Containers
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'monitoring/docker-compose.yaml'
+      - 'monitoring/Dockerfile'
+      - 'monitoring/prometheus.yml'
+      - '.github/workflows/monitoring-docker.yaml'
+  workflow_dispatch:
+
+
+jobs:
+  bring-up-monitoring:
+    runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
+
+    steps:
+      # Clone only the specific path from that branch (Sparse Checkout)
+      - name: Checkout specific path
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          sparse-checkout: |
+            monitoring
+          sparse-checkout-cone-mode: true
+
+      # Run your Windows command inside the target folder
+      - name: Run command in path
+        working-directory: .\monitoring
+        env:
+          GF_SECURITY_ADMIN_USER: ${{ secrets.GF_SECURITY_ADMIN_USER }}
+          GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
+        run: |
+          Write-Output "Currently running in: $(Get-Location)"
+          docker compose -p monitoring up -d
+      - name: Post-run workspace cleanup
+        if: always()
+        run: |
+          Write-Output "Cleaning up self-hosted workspace..."
+          Remove-Item -Path * -Recurse -Force -ErrorAction SilentlyContinue

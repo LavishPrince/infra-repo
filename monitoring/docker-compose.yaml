@@ -11,7 +11,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:latest-slim
     container_name: grafana
     restart: unless-stopped
     ports:

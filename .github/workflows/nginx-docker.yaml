@@ -32,7 +32,7 @@ jobs:
         working-directory: .\nginx
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          docker compose -p nginx up -d --build
+          docker compose -p nginx up -d --build --pull always
           docker compose exec nginx-proxy nginx -s reload
       - name: Post-run workspace cleanup
         if: always()

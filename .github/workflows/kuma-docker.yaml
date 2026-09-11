@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'kuma/docker-compose.yaml'
+      - 'kuma/**'
       - '.github/workflows/kuma-docker.yaml'
   workflow_dispatch:
 

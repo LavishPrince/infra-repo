@@ -5,9 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'monitoring/docker-compose.yaml'
-      - 'monitoring/Dockerfile'
-      - 'monitoring/prometheus.yml'
+      - 'monitoring/**'
       - '.github/workflows/monitoring-docker.yaml'
   workflow_dispatch:
 

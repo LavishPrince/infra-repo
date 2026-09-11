@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'databases/docker-compose.yaml'
+      - 'databases/**'
       - '.github/workflows/databases-docker.yaml'
   workflow_dispatch:
 

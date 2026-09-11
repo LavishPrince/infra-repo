@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'nginx/docker-compose.yaml'
+      - 'nginx/**'
       - '.github/workflows/nginx-docker.yaml'
   workflow_dispatch:
 

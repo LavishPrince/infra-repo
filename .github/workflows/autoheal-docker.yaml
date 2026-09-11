@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'autoheal/docker-compose.yaml'
+      - 'autoheal/**'
       - '.github/workflows/autoheal-docker.yaml'
   workflow_dispatch:
 

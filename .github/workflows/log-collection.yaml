@@ -1,0 +1,42 @@
+name: Log Collection Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'log_collection/**'
+      - '.github/workflows/log-collection.yaml'
+  workflow_dispatch:
+
+
+jobs:
+  bring-up-log-collection:
+    runs-on: [self-hosted, Windows, X64]  # Targets your self-hosted runner pool
+    defaults:
+      run:
+        shell: powershell -ExecutionPolicy Bypass {0}
+
+    steps:
+      # Clone only the specific path from that branch (Sparse Checkout)
+      - name: Checkout specific path
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+          sparse-checkout: |
+            log_collection
+          sparse-checkout-cone-mode: true
+
+      # Run your Windows command inside the target folder
+      - name: Run command in path
+        env:
+          ZO_ROOT_USER_PASSWORD: ${{ secrets.ZO_ROOT_USER_PASSWORD }}
+        working-directory: .\log_collection
+        run: |
+          Write-Output "Currently running in: $(Get-Location)"
+          docker compose -p log_collection up -d
+      - name: Post-run workspace cleanup
+        if: always()
+        run: |
+          Write-Output "Cleaning up self-hosted workspace..."
+          Remove-Item -Path * -Recurse -Force -ErrorAction SilentlyContinue

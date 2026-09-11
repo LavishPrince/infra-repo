@@ -38,6 +38,8 @@ services:
     volumes:
       - redis_01:/data
     command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    networks:
+      - redis_01
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s

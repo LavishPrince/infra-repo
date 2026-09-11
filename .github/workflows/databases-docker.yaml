@@ -33,6 +33,7 @@ jobs:
         env:
           TF_VAR_pwd_postgres_01: ${{ secrets.TF_VAR_PWD_POSTGRES_01 }}
           TF_VAR_pwd_postgres_02: ${{ secrets.TF_VAR_PWD_POSTGRES_02 }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
         run: |
           Write-Output "Currently running in: $(Get-Location)"
           docker compose -p databases up -d

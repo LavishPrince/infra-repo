@@ -12,10 +12,14 @@ sinks:
       - docker_logs
     uri: http://openobserve:5080/api/default/_json
     # Basic auth configuration nested under request
-    request:
-      auth:
-        strategy: basic
-        user: "vinay.dg@quation.in"
-        password: "${OPENOBSERVE_TOKEN}"
+    auth:
+      strategy: basic
+      user: "vinay.dg@quation.in"
+      password: "${OPENOBSERVE_TOKEN}"
+    compression: gzip
+    method: post
     encoding:
       codec: json
+      timestamp_format: rfc3339
+    healthcheck:
+      enabled: false

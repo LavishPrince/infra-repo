@@ -35,7 +35,7 @@ jobs:
         working-directory: .\log_collection
         run: |
           Write-Output "Currently running in: $(Get-Location)"
-          docker compose -p log_collection up -d
+          docker compose -p log_collection up -d --build
       - name: Post-run workspace cleanup
         if: always()
         run: |

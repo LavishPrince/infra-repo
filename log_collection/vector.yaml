@@ -10,7 +10,7 @@ sinks:
     type: http
     inputs:
       - docker_logs
-    uri: http://openobserve:5080/api/default/_json
+    uri: http://openobserve:5080/api/default/default/_json
     # Basic auth configuration nested under request
     auth:
       strategy: basic

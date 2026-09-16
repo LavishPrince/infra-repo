@@ -16,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: vector.Dockerfile
+      arguments:
+        OPENOBSERVE_TOKEN: ${OPENOBSERVE_TOKEN}
     container_name: vector_collector
     restart: unless-stopped
     volumes:

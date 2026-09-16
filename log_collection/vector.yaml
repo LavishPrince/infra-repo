@@ -3,7 +3,7 @@ sources:
     type: docker_logs
     # Crucial for Docker Desktop: forces API streaming instead of file tailing
     # Exclude Vector itself so it doesn't create an infinite logging loop
-    endpoint: "unix:///var/run/docker.sock" 
+    docker_host: "unix:///var/run/docker.sock" 
     exclude_containers:
       - vector_collector
 

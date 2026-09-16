@@ -11,9 +11,11 @@ sinks:
     inputs:
       - docker_logs
     uri: http://openobserve:5080/api/default/_json
-    # Custom headers must be placed under the request block
+    # Basic auth configuration nested under request
     request:
-      headers:
-        Authorization: "Bearer ${OPENOBSERVE_TOKEN}"
+      auth:
+        strategy: basic
+        user: "vinay.dg@quation.in"
+        password: "${OPENOBSERVE_TOKEN}"
     encoding:
       codec: json

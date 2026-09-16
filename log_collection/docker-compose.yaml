@@ -12,7 +12,16 @@ services:
       - ZO_ROOT_USER_PASSWORD=${ZO_ROOT_USER_PASSWORD}
     volumes:
       - openobserve_data:/data
-
+  vector_collector:
+    build:
+      context: .
+      dockerfile: vector.Dockerfile
+    container_name: vector_collector
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - OPENOBSERVE_TOKEN=${OPENOBSERVE_TOKEN}
 volumes:
   openobserve_data:
     external: true

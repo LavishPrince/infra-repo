@@ -31,6 +31,7 @@ jobs:
       - name: Run command in path
         env:
           ZO_ROOT_USER_PASSWORD: ${{ secrets.ZO_ROOT_USER_PASSWORD }}
+          OPENOBSERVE_TOKEN: ${{ secrets.OPENOBSERVE_TOKEN }}
         working-directory: .\log_collection
         run: |
           Write-Output "Currently running in: $(Get-Location)"

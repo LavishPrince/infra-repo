@@ -8,6 +8,8 @@ services:
     networks:
       - nginx_reverse_proxy
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
   nginx_reverse_proxy:

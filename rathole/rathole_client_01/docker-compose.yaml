@@ -3,7 +3,7 @@ services:
     build:
       context: .
       args:
-        - VPS_IP=35.154.170.127
+        - VPS_IP=${VPS_IP}
         - VPS_PUBLIC_KEY=${VPS_PUBLIC_KEY}
         - TOKEN_SERVICE_1=${TOKEN_SERVICE_1}
     container_name: rathole-client1

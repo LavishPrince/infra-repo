@@ -3,10 +3,11 @@ remote_addr = "${VPS_IP}:2333"
 
 [client.transport]
 type = "noise"
-# The public key of the VPS used to verify its identity
+
+[client.transport.noise]
 remote_public_key = "${VPS_PUBLIC_KEY}"
 
 [[client.services]]
 name = "service1"
 token = "${TOKEN_SERVICE_1}"
-bind_addr = "127.0.0.1:80"
+bind_addr = "127.0.0.1:8080"

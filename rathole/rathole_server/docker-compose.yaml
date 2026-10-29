@@ -1,0 +1,14 @@
+services:
+  rathole-server:
+    build:
+      context: .
+      args:
+        - TOKEN_SERVICE_1=${TOKEN_SERVICE_1}
+        # - TOKEN_SERVICE_2=${TOKEN_SERVICE_2}
+        - VPS_PRIVATE_KEY=${VPS_PRIVATE_KEY}
+    container_name: rathole-server
+    restart: unless-stopped
+    ports:
+      - "2333:2333"
+      - "8081:8081"
+      # - "8082:8082"

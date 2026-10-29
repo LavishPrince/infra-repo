@@ -1,0 +1,10 @@
+[server]
+bind_addr = "0.0.0.0:2333"
+
+[server.transport]
+type = "noise"
+private_key = "${VPS_PRIVATE_KEY}"
+
+[server.services.service1]
+token = "${TOKEN_SERVICE_1}"
+bind_addr = "0.0.0.0:8081"

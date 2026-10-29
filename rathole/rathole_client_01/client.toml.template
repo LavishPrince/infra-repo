@@ -9,5 +9,5 @@ remote_public_key = "${VPS_PUBLIC_KEY}"
 
 [client.services.service1]
 token = "${TOKEN_SERVICE_1}"
-local_addr = "127.0.0.1:8080"
+local_addr = "host.docker.internal:8080"
 

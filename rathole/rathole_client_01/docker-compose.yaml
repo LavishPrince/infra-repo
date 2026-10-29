@@ -8,3 +8,5 @@ services:
         - TOKEN_SERVICE_1=${TOKEN_SERVICE_1}
     container_name: rathole-client1
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

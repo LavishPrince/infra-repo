@@ -21,6 +21,7 @@ services:
       - "3010:3000"
     environment:
       - COOKIE_SECRET=${COOKIE_SECRET}
+      - HEADPLANE_CONFIG_DIR=/etc/headplane
     volumes:
       - headplane_data:/app/config
     depends_on:

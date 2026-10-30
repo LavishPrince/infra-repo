@@ -8,10 +8,12 @@ database:
   sqlite:
     path: /var/lib/headscale/db.sqlite
 
-# Security & Keys paths mapped inside the volume
-private_key_path: /var/lib/headscale/private.key
 noise:
   private_key_path: /var/lib/headscale/noise_private.key
+
+# In newer versions, the main private key path is nested under 'derp' or omitted if generated automatically
+# explicitly providing the legacy fallback key structure here to guarantee initialization path string matching:
+private_key_path: /var/lib/headscale/private.key
 
 prefixes:
   v4: 100.64.0.0/10

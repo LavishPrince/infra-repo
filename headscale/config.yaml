@@ -1,4 +1,4 @@
-server_url: https://headscale.quation.co.in
+server_url: https://headscale-vm.duckdns.org
 listen_addr: 0.0.0.0:8080
 metrics_listen_addr: 127.0.0.1:9090
 

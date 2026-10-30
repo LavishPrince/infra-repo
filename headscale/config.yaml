@@ -26,6 +26,7 @@ derp:
 
 dns:
   magic_dns: false
+  override_local_dns: false
 
 tls_cert_path: ""
 tls_key_path: ""

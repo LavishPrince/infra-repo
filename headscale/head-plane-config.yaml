@@ -6,7 +6,7 @@ server:
 
 headscale:
   url: "http://headscale:8080"
-  public_url: "https://yourdomain.com"
+  public_url: "https://headscale.quation.co.in"
   config_path: "/etc/headscale/config.yaml"
 
 integration:

@@ -20,8 +20,9 @@ services:
     ports:
       - "3010:3000"
     environment:
-      - COOKIE_SECRET=${COOKIE_SECRET}
       - HEADPLANE_CONFIG_FILE=/etc/headplane/config.yaml
+      - HEADPLANE_LOAD_ENV_OVERRIDES=true
+      - HEADPLANE_SERVER__COOKIE_SECRET=${COOKIE_SECRET}
     volumes:
       - headplane_data:/app/config
     depends_on:

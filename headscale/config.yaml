@@ -3,8 +3,10 @@ listen_addr: 0.0.0.0:8080
 metrics_listen_addr: 127.0.0.1:9090
 
 # Using /var/lib/headscale which will map to our named Docker Volume
-db_type: sqlite3
-db_path: /var/lib/headscale/db.sqlite
+database:
+  type: sqlite3
+  sqlite:
+    path: /var/lib/headscale/db.sqlite
 
 # Security & Keys paths mapped inside the volume
 private_key_path: /var/lib/headscale/private.key

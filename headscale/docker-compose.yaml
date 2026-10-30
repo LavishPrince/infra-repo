@@ -24,7 +24,7 @@ services:
       - HEADPLANE_LOAD_ENV_OVERRIDES=true
       - HEADPLANE_SERVER__COOKIE_SECRET=${COOKIE_SECRET}
     volumes:
-      - headplane_data:/app/config
+      - headplane_data:/var/lib/headplane
     depends_on:
       - headscale
 

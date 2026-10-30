@@ -24,6 +24,9 @@ derp:
   urls:
     - https://tailscale.com
 
+dns:
+  magic_dns: false
+
 tls_cert_path: ""
 tls_key_path: ""
 log_level: info

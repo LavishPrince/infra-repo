@@ -4,16 +4,12 @@ metrics_listen_addr: 127.0.0.1:9090
 
 # Using /var/lib/headscale which will map to our named Docker Volume
 database:
-  type: sqlite3
+  type: sqlite
   sqlite:
     path: /var/lib/headscale/db.sqlite
 
 noise:
   private_key_path: /var/lib/headscale/noise_private.key
-
-# In newer versions, the main private key path is nested under 'derp' or omitted if generated automatically
-# explicitly providing the legacy fallback key structure here to guarantee initialization path string matching:
-private_key_path: /var/lib/headscale/private.key
 
 prefixes:
   v4: 100.64.0.0/10
@@ -25,13 +21,18 @@ derp:
     region_code: "headscale"
     region_name: "Headscale Embedded DERP"
     stun_listen_addr: "0.0.0.0:3478"
+    private_key_path: /var/lib/headscale/derp_server_private.key
   urls:
-    - https://tailscale.com
+    - https://controlplane.tailscale.com/derpmap/default
 
 dns:
   magic_dns: false
   override_local_dns: false
 
-tls_cert_path: ""
-tls_key_path: ""
-log_level: info
+# TLS is terminated by the reverse proxy in front of Headscale.
+tls:
+  cert_path: ""
+  key_path: ""
+
+log:
+  level: info

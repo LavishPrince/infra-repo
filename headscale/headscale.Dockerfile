@@ -1,9 +1,7 @@
 FROM headscale/headscale:latest
 
-# Create directory for config if not present
+# Headscale reads /etc/headscale/config.yaml by default. Keep the config out of
+# /var/lib/headscale so the named data volume cannot shadow it.
+COPY config.yaml /etc/headscale/config.yaml
 
-COPY config.yaml /var/lib/headscale/config.yaml
-
-
-ENTRYPOINT ["headscale"]
 CMD ["serve"]
